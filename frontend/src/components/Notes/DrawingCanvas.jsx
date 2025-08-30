@@ -1,6 +1,10 @@
 // src/components/Notes/DrawingCanvas.jsx
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios'; // Import axios for direct Cloudinary upload
+import api from '../../services/apiClient';
+import toast from 'react-hot-toast';
+
+
 
 export default function DrawingCanvas({ onInsert, onClose }) {
   const canvasRef = useRef(null);
@@ -12,9 +16,6 @@ export default function DrawingCanvas({ onInsert, onClose }) {
   const undoStack = useRef([]);
   const redoStack = useRef([]);
 
-  // Cloudinary configuration from environment variables
-  // const CLOUDINARY_CLOUD_NAME = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
-  // const CLOUDINARY_UPLOAD_PRESET = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -179,55 +180,32 @@ export default function DrawingCanvas({ onInsert, onClose }) {
     ctx.clearRect(0,0,canvas.clientWidth,canvas.clientHeight);
   }
 
+  // This function is needed for the download button
   function exportDataUrl() {
     const canvas = canvasRef.current;
     return canvas.toDataURL('image/png');
   }
 
-  async function uploadDataUrl(dataUrl) {
-    // if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_UPLOAD_PRESET) {
-    //   console.error('Cloudinary credentials not set in environment variables.');
-    //   // Fallback to dataUrl if Cloudinary is not configured
-    //   return dataUrl;
-    // }
-
-    // Convert dataUrl to Blob
-    const res = await fetch(dataUrl);
-    const blob = await res.blob();
-
-    //This is to upload the picture directly from frontend to cloudinary
-    // const formData = new FormData();
-    // formData.append("file", blob);
-    // formData.append("upload_preset", CLOUDINARY_UPLOAD_PRESET); // Use unsigned preset
-
-    // try {
-    //   const cloudinaryResponse = await axios.post(
-    //     `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`,
-    //     formData
-    //   );
-    //   return cloudinaryResponse.data.secure_url;
-    // } catch (err) {
-    //   console.error('Cloudinary upload failed', err);
-    //   // Fallback to dataUrl if upload fails
-    //   return dataUrl;
-    // }
-
+  // This function handles the upload to the backend
+  async function uploadDrawing() {
+    const canvas = canvasRef.current;
+    const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+    
     const fd = new FormData();
     fd.append('file', blob, 'drawing.png');
+    
     try {
-      // Send to your backend's /api/uploads endpoint
-      const resp = await axios.post('/api/uploads', fd, {
+      // Use the imported api instance
+      const resp = await api.post('/api/uploads', fd, {
         headers: {
-          'Content-Type': 'multipart/form-data', // Important for FormData
+          'Content-Type': 'multipart/form-data',
         },
       });
-      const json = resp.data; // axios automatically parses JSON
+      const json = resp.data;
       if (json && json.url) return json.url;
-      // return dataUrl; // Fallback to dataUrl if backend doesn't return a URL
       throw new Error('Backend did not return a valid URL.');
     } catch (err) {
       console.error('Upload to backend failed', err);
-      // return dataUrl; // Fallback to dataUrl if upload fails
       throw err;
     }
   }
@@ -261,8 +239,7 @@ export default function DrawingCanvas({ onInsert, onClose }) {
 
           <div className="ml-auto flex gap-2">
             <button className="px-3 py-1 bg-green-600 text-white rounded" onClick={async ()=>{
-              const urlOrData = exportDataUrl();
-              const uploaded = await uploadDataUrl(urlOrData);
+              const uploaded = await uploadDrawing();
               onInsert && onInsert(uploaded);
             }}>Insert drawing</button>
             <button className="px-3 py-1 border rounded" onClick={()=>{ const a = document.createElement('a'); a.href=exportDataUrl(); a.download='drawing.png'; a.click(); }}>Download</button>

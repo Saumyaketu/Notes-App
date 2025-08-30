@@ -38,3 +38,5 @@ export async function apiDelete(path, token) {
   });
   return res.data;
 }
+
+export default api;
