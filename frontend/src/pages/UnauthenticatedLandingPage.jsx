@@ -1,9 +1,36 @@
 // src/pages/UnauthenticatedLandingPage.jsx
 
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../hooks/useAuth';
 
 export default function UnauthenticatedLandingPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleCredentialResponse = async ({ credential }) => {
+    const r = await login(credential);
+    if (r === true) {
+      navigate("/");
+    } else {
+      console.error('Google sign-in failed');
+      // Optionally handle errors here
+    }
+  };
+
+  useEffect(() => {
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+      window.google.accounts.id.renderButton(
+        document.getElementById("google-sign-in-button"),
+        { theme: "outline", size: "large", type: "standard", text: "signup_with" }
+      );
+    }
+  }, []);
+
   return (
     <main className="flex-1 flex items-center justify-center px-4 py-12">
       <div className="max-w-4xl w-full bg-card rounded-lg shadow p-8 bg-[var(--color-bg-card)]">
@@ -14,9 +41,9 @@ export default function UnauthenticatedLandingPage() {
               Capture ideas, store docs, and share what you want with a single click. Works great for personal notes or small teams.
             </p>
 
-            <div className="flex gap-3">
+            <div className="flex gap-3 items-center">
               <Link to="/register" className="px-4 py-2 bg-[var(--color-accent-green)] text-white rounded transition-transform transform hover:scale-105">Get started — it's free</Link>
-              <Link to="/login" className="px-4 py-2 bg-white border rounded transition-transform transform hover:scale-105">Sign in</Link>
+              <div id="google-sign-in-button"></div>
             </div>
           </div>
 

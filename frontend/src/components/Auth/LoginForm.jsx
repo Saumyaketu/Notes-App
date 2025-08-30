@@ -1,6 +1,6 @@
 // src/components/Auth/LoginForm.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -10,6 +10,31 @@ export default function LoginForm() {
   const [hasError, setHasError] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  const handleCredentialResponse = async ({ credential }) => {
+    // Send the ID token to your backend
+    const r = await login(credential);
+    if (r === true) {
+      navigate("/");
+    } else {
+      setHasError(true);
+      setTimeout(() => setHasError(false), 500);
+    }
+  };
+
+  useEffect(() => {
+    // Check if the Google script is loaded
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+      window.google.accounts.id.renderButton(
+        document.getElementById("google-sign-in-button"),
+        { theme: "outline", size: "large", type: "standard" } // customization attributes
+      );
+    }
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -53,6 +78,14 @@ export default function LoginForm() {
           Register
         </a>
       </div>
+
+      <div className="flex items-center my-4">
+        <div className="flex-grow border-t border-gray-300"></div>
+        <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
+        <div className="flex-grow border-t border-gray-300"></div>
+      </div>
+      
+      <div id="google-sign-in-button" className="mx-auto"></div>
     </form>
   );
 }

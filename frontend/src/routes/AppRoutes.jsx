@@ -16,6 +16,7 @@ export default function AppRoutes() {
   return (
     <Suspense fallback={<div className="p-6">Loading...</div>}>
       <Routes>
+        <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/s/:shareId" element={<PublicNote />} />
@@ -27,14 +28,6 @@ export default function AppRoutes() {
           element={
             <RequireAuth>
               <NoteDetail />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/"
-          element={
-            <RequireAuth>
-              <Home />
             </RequireAuth>
           }
         />

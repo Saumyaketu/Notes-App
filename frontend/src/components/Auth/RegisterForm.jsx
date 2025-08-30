@@ -1,6 +1,6 @@
 // src/components/Auth/RegisterForm.jsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useNavigate } from "react-router-dom";
 
@@ -9,8 +9,32 @@ export default function RegisterForm() {
   const [name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [hasError, setHasError] = useState(false);
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const navigate = useNavigate();
+
+  const handleCredentialResponse = async ({ credential }) => {
+    const r = await login(credential);
+    if (r === true) {
+      navigate("/");
+    } else {
+      setHasError(true);
+      setTimeout(() => setHasError(false), 500);
+    }
+  };
+
+  useEffect(() => {
+    // Check if the Google script is loaded
+    if (window.google) {
+      window.google.accounts.id.initialize({
+        client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+        callback: handleCredentialResponse,
+      });
+      window.google.accounts.id.renderButton(
+        document.getElementById("google-sign-up-button"),
+        { theme: "outline", size: "large", type: "standard", text: "signup_with" }
+      );
+    }
+  }, []);
 
   const submit = async (e) => {
     e.preventDefault();
@@ -62,6 +86,12 @@ export default function RegisterForm() {
           Sign in
         </a>
       </div>
+      <div className="flex items-center my-4">
+        <div className="flex-grow border-t border-gray-300"></div>
+        <span className="flex-shrink mx-4 text-gray-500 text-sm">or</span>
+        <div className="flex-grow border-t border-gray-300"></div>
+      </div>
+      <div id="google-sign-up-button" className="mx-auto"></div>
     </form>
   );
 }

@@ -1,3 +1,5 @@
+// src/contexts/AuthContext.jsx
+
 import React, { createContext, useState, useEffect } from "react";
 import * as authService from "../services/authService";
 import { loadToken, saveToken, clearToken } from "../utils/storage";
@@ -21,8 +23,16 @@ export function AuthProvider({ children }) {
     }
   }, [token]);
 
-  const login = async (email, password) => {
-    const res = await authService.login(email, password);
+  const login = async (emailOrToken, password) => {
+    let res;
+    if (typeof emailOrToken === 'string' && password) {
+      // Standard email/password login
+      res = await authService.login(emailOrToken, password);
+    } else {
+      // Google Sign-In with ID token
+      res = await authService.googleLogin(emailOrToken);
+    }
+    
     if (res.token) {
       saveToken(res.token);
       setToken(res.token);
@@ -30,6 +40,7 @@ export function AuthProvider({ children }) {
     }
     return res;
   };
+
   const register = async (name, email, password) => {
     const res = await authService.register(name, email, password);
     if (res.token) {
