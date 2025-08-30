@@ -10,10 +10,10 @@ export function NotesProvider({ children }) {
   const [loading, setLoading] = useState(false);
 
   const fetchNotes = useCallback(
-    async (q = "") => {
+    async (q = "", filter = 'all') => {
       if (!token) return;
       setLoading(true);
-      const res = await notesService.getNotes(token, q);
+      const res = await notesService.getNotes(token, q, filter);
       setNotes(res.notes || []);
       setLoading(false);
     },

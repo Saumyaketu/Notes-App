@@ -83,6 +83,21 @@ export default function NoteDetail() {
     await notesService.deleteNote(token, id);
     navigate("/");
   };
+  
+  const handleToggleStar = async () => {
+    const res = await notesService.updateNote(token, id, { isStarred: !note.isStarred });
+    if (!res.error) {
+        setNote((v) => ({ ...v, isStarred: !v.isStarred }));
+    }
+  };
+
+  const handleToggleArchive = async () => {
+    const res = await notesService.updateNote(token, id, { isArchived: !note.isArchived });
+    if (!res.error) {
+        setNote((v) => ({ ...v, isArchived: !v.isArchived }));
+    }
+  };
+
 
   const togglePublic = async () => {
     const res = await notesService.updateNote(token, id, {
@@ -119,6 +134,8 @@ export default function NoteDetail() {
               setTitle={setTitle}
               saving={saving}
               onTogglePublic={togglePublic}
+              onToggleStar={handleToggleStar}
+              onToggleArchive={handleToggleArchive}
               onDelete={remove}
             />
             <NoteEditor

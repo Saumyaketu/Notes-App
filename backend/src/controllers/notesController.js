@@ -16,18 +16,32 @@ function canAccess(note, userId) {
 export async function listNotes(req, res) {
   const userId = req.user.userId;
   const q = (req.query.q || '').trim();
+  const filter = req.query.filter || 'all'; // new filter parameter
 
   try {
+    let query = { owner: userId };
+    
+    // Apply filters from the new sidebar
+    if (filter === 'starred') {
+        query.isStarred = true;
+        query.isArchived = false;
+    } else if (filter === 'archived') {
+        query.isArchived = true;
+    } else { // default is 'all'
+        query.isArchived = false;
+    }
+
     if (q) {
+      query.$text = { $search: q };
       const results = await Note.find(
-        { owner: userId, $text: { $search: q } },
+        query,
         { score: { $meta: 'textScore' } }
       )
         .sort({ score: { $meta: 'textScore' } })
         .limit(100);
       return res.json({ notes: results });
     } else {
-      const notes = await Note.find({ owner: userId }).sort({ updatedAt: -1 }).limit(500);
+      const notes = await Note.find(query).sort({ updatedAt: -1 }).limit(500);
       return res.json({ notes });
     }
   } catch (err) {
@@ -126,6 +140,15 @@ export async function updateNote(req, res) {
         updateDoc.$set.shareId = generateShareId();
       }
     }
+    
+    // New logic for starring and archiving
+    if (typeof patch.isStarred !== 'undefined') {
+        updateDoc.$set.isStarred = !!patch.isStarred;
+    }
+    if (typeof patch.isArchived !== 'undefined') {
+        updateDoc.$set.isArchived = !!patch.isArchived;
+    }
+
 
     const updatedNote = await Note.findByIdAndUpdate(
       id,

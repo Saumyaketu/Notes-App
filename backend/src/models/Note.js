@@ -14,6 +14,8 @@ const NoteSchema = new Schema({
   title: { type: String, default: '' },
   content: { type: String, default: '' }, // markdown
   isPublic: { type: Boolean, default: false },
+  isStarred: { type: Boolean, default: false }, // Added for new feature
+  isArchived: { type: Boolean, default: false }, // Added for new feature
   shareId: { type: String, index: true, sparse: true },
   collaborators: [{ type: Schema.Types.ObjectId, ref: 'User' }],
   versions: [VersionSchema],

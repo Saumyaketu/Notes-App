@@ -3,12 +3,41 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import clsx from 'clsx';
+import { FiStar, FiArchive, FiTrash2 } from 'react-icons/fi';
+import { useNotes } from '../../hooks/useNotes';
+import { useAuth } from '../../hooks/useAuth';
+import * as notesService from '../../services/notesService';
+
 const NoteCard = React.memo(({ note = {} }) => {
+  const { token } = useAuth();
+  const { fetchNotes } = useNotes();
   if (!note) return null;
 
   const title = note.title || 'Untitled';
   const content = note.content || '';
   const tags = Array.isArray(note.tags)? note.tags : [];
+
+  const handleToggleStar = async (e) => {
+    e.preventDefault();
+    if (!token) return;
+    await notesService.updateNote(token, note._id, { isStarred: !note.isStarred });
+    fetchNotes();
+  };
+  
+  const handleToggleArchive = async (e) => {
+    e.preventDefault();
+    if (!token) return;
+    await notesService.updateNote(token, note._id, { isArchived: !note.isArchived });
+    fetchNotes();
+  };
+
+  const handleDelete = async (e) => {
+    e.preventDefault();
+    if (!window.confirm('Are you sure you want to delete this note?')) return;
+    if (!token) return;
+    await notesService.deleteNote(token, note._id);
+    fetchNotes();
+  };
 
   return (
     <article
@@ -41,6 +70,15 @@ const NoteCard = React.memo(({ note = {} }) => {
           ))}
         </div>
         <div className="flex gap-2 items-center">
+          <button onClick={handleToggleStar} title="Star/Unstar" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+            <FiStar className={note.isStarred ? 'text-yellow-500' : 'text-gray-500'} />
+          </button>
+          <button onClick={handleToggleArchive} title="Archive/Unarchive" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+            <FiArchive className={note.isArchived ? 'text-blue-500' : 'text-gray-500'} />
+          </button>
+          <button onClick={handleDelete} title="Delete" className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700">
+            <FiTrash2 className="text-red-500" />
+          </button>
           <Link to={`/notes/${note._id}`} className="text-sm text-link hover:underline">
             Open →
           </Link>

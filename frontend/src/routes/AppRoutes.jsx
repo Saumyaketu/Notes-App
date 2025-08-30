@@ -8,6 +8,7 @@ import RequireAuth from "./RequireAuth";
 const Login = lazy(() => import("../pages/Login"));
 const Register = lazy(() => import("../pages/Register"));
 const Home = lazy(() => import("../pages/Home"));
+const AuthenticatedHome = lazy(() => import("../pages/AuthenticatedHome"));
 const NoteDetail = lazy(() => import("../pages/NoteDetail"));
 const PublicNote = lazy(() => import("../pages/PublicNote"));
 const NotFound = lazy(() => import("../pages/NotFound"));
@@ -22,15 +23,16 @@ export default function AppRoutes() {
         <Route path="/s/:shareId" element={<PublicNote />} />
         <Route path="*" element={<NotFound />} />
         
-        {/* Protected Routes */}
-        <Route
-          path="/notes/:id"
-          element={
-            <RequireAuth>
-              <NoteDetail />
-            </RequireAuth>
-          }
-        />
+        {/* Protected Routes - These all use the Home component for layout */}
+        <Route element={<RequireAuth><Home /></RequireAuth>}>
+            <Route path="/starred" element={<AuthenticatedHome />} />
+            <Route path="/archive" element={<AuthenticatedHome />} />
+            <Route path="/notes/:id" element={<NoteDetail />} />
+            <Route path="/create" element={<NoteDetail />} />
+        </Route>
+
+        {/* Catch-all route */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Suspense>
   );

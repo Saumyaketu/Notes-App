@@ -1,6 +1,6 @@
 import { apiGet, apiPost, apiPut, apiDelete } from './apiClient'
 
-export const getNotes = (token,q='') => apiGet(`/api/notes?q=${encodeURIComponent(q)}`, token)
+export const getNotes = (token,q='', filter='') => apiGet(`/api/notes?q=${encodeURIComponent(q)}&filter=${encodeURIComponent(filter)}`, token)
 
 export const createNote = (token,note) => apiPost('/api/notes', note, token)
 

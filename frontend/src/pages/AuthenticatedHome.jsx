@@ -1,7 +1,7 @@
 // src/pages/AuthenticatedHome.jsx
 
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Layout/Sidebar';
 import { useAuth } from '../hooks/useAuth';
 import { useNotes } from '../hooks/useNotes';
@@ -12,17 +12,33 @@ export default function AuthenticatedHome() {
   const { notes, loading, fetchNotes, createNote } = useNotes() || {};
   const { user } = useAuth() || {};
   const [q, setQ] = useState("");
+  const location = useLocation();
+  const [currentPageTitle, setCurrentPageTitle] = useState('');
 
   useEffect(() => {
-    fetchNotes(q);
-  }, [fetchNotes, q]);
+    // Determine filter from current path
+    const path = location.pathname;
+    let filter = 'all';
+    let title = 'All Notes';
+    
+    if (path === '/starred') {
+      filter = 'starred';
+      title = 'Starred Notes';
+    } else if (path === '/archive') {
+      filter = 'archived';
+      title = 'Archived Notes';
+    }
+    
+    setCurrentPageTitle(title);
+    fetchNotes(q, filter);
+  }, [fetchNotes, q, location.pathname]);
 
   return (
     <div className="min-h-screen bg-[var(--color-bg-primary)] flex">
       <Sidebar />
       <main className="flex-1 p-6">
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold">Welcome back{user? `, ${user.name}` : ''}.</h1>
+          <h1 className="text-2xl font-bold">{currentPageTitle}</h1>
           <div className="flex items-center gap-3">
             <div className="relative">
               <input
