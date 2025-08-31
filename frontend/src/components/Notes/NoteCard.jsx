@@ -8,7 +8,7 @@ import { useNotes } from '../../hooks/useNotes';
 import { useAuth } from '../../hooks/useAuth';
 import * as notesService from '../../services/notesService';
 
-const NoteCard = React.memo(({ note = {} }) => {
+const NoteCard = React.memo(({ note = {}, filter, query }) => {
   const { token } = useAuth();
   const { fetchNotes } = useNotes();
   if (!note) return null;
@@ -21,14 +21,14 @@ const NoteCard = React.memo(({ note = {} }) => {
     e.preventDefault();
     if (!token) return;
     await notesService.updateNote(token, note._id, { isStarred: !note.isStarred });
-    fetchNotes();
+    fetchNotes(query, filter);
   };
   
   const handleToggleArchive = async (e) => {
     e.preventDefault();
     if (!token) return;
     await notesService.updateNote(token, note._id, { isArchived: !note.isArchived });
-    fetchNotes();
+    fetchNotes(query, filter);
   };
 
   const handleDelete = async (e) => {
@@ -36,7 +36,7 @@ const NoteCard = React.memo(({ note = {} }) => {
     if (!window.confirm('Are you sure you want to delete this note?')) return;
     if (!token) return;
     await notesService.deleteNote(token, note._id);
-    fetchNotes();
+    fetchNotes(query, filter);
   };
 
   return (

@@ -23,13 +23,11 @@ export default function AppRoutes() {
         <Route path="/s/:shareId" element={<PublicNote />} />
         <Route path="*" element={<NotFound />} />
         
-        {/* Protected Routes - These all use the Home component for layout */}
-        <Route element={<RequireAuth><Home /></RequireAuth>}>
-            <Route path="/starred" element={<AuthenticatedHome />} />
-            <Route path="/archive" element={<AuthenticatedHome />} />
-            <Route path="/notes/:id" element={<NoteDetail />} />
-            <Route path="/create" element={<NoteDetail />} />
-        </Route>
+        {/* Protected Routes */}
+        <Route path="/starred" element={<RequireAuth><AuthenticatedHome /></RequireAuth>} />
+        <Route path="/archive" element={<RequireAuth><AuthenticatedHome /></RequireAuth>} />
+        <Route path="/notes/:id" element={<RequireAuth><NoteDetail /></RequireAuth>} />
+        <Route path="/create" element={<RequireAuth><NoteDetail /></RequireAuth>} />
 
         {/* Catch-all route */}
         <Route path="*" element={<NotFound />} />

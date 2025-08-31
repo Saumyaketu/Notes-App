@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { FiPlus, FiStar, FiArchive, FiSettings } from 'react-icons/fi';
+import { FiPlus, FiHome, FiStar, FiArchive, FiSettings } from 'react-icons/fi';
 
 const Item = ({ to, icon: Icon, children }) => (
   <NavLink to={to} className={({ isActive }) => `flex items-center gap-2 px-3 py-2 rounded-md text-sm transition-colors duration-200 ${isActive? 'bg-[var(--color-bg-sidebar-item-active)] text-[var(--color-text-sidebar-item-active)] font-medium' : 'text-text-primary text-[var(--color-text-primary)] hover:bg-[var(--color-bg-sidebar-item-hover)] hover:text-[var(--color-text-sidebar-item-hover)]'}`}>
@@ -20,7 +20,7 @@ export default function Sidebar(){
       </div>
 
       <nav className="space-y-1">
-        <Item to="/" icon={FiStar}>All notes</Item>
+        <Item to="/" icon={FiHome}>Home</Item>
         <Item to="/starred" icon={FiStar}>Starred</Item>
         <Item to="/archive" icon={FiArchive}>Archive</Item>
         <Item to="/settings" icon={FiSettings}>Settings</Item>

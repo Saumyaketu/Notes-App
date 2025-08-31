@@ -13,11 +13,11 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Header />
+      {/* <Header /> */}
       <Suspense fallback={<div className="p-6">Loading...</div>}>
         {token? <AuthenticatedHome /> : <UnauthenticatedLandingPage />}
       </Suspense>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
