@@ -50,9 +50,9 @@ export default function UnauthenticatedLandingPage() {
 
           <div className="w-full md:w-1/3 p-4 rounded bg-[var(--color-bg-hover)]">
             <div className="text-sm text-muted mb-2">Preview</div>
-            <div className="bg-white p-3 rounded border">
-              <h3 className="font-medium text-sm"># Meeting notes</h3>
-              <p className="text-xs text-muted line-clamp-3 mt-2">- Roadmap review{'\n'}- Assign owners{'\n'}- Follow-ups</p>
+            <div className="bg-[var(--color-bg-card)] rounded">
+              <h3 className="font-medium text-sm mt-2">Meeting notes</h3>
+              <p className="text-xs text-muted line-clamp-3 mt-2">- Roadmap review<br/>- Assign owners<br/>- Follow-ups</p>
             </div>
           </div>
         </div>
